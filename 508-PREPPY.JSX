@@ -4,7 +4,8 @@
 // Started June 2019
 
 /*
-// This software is provided under the MIT License 
+This software is provided under the MIT License.
+
 Copyright (c) 2019 Ri Le
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,23 +27,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// RESOURCES
-//--------------------------------
-/*
-API Documentation available at
-http://jongware.mit.edu/idcsjs5.5/pc_ParagraphStyle.html
-
-https://marketplace.visualstudio.com/items?itemName=Adobe.extendscript-debug
-
-https://code.visualstudio.com/api/extension-guides/debugger-extension
-
-https://stackoverflow.com/questions/8545497/console-log-with-photoshop-scripting-extendedscript-toolkit
-
-https://graphicdesign.stackexchange.com/questions/56175/indesign-script-to-replace-paragraph-style
-
-*/
-//--------------------------------
-
 // Re-map old styles to new ones
 /// https://forums.adobe.com/thread/885625
 
@@ -56,6 +40,10 @@ function myMain() {
     var doc = app.activeDocument; // Get the current document
     var allParaStyles = doc.allParagraphStyles; // Get array of all paragraph styles
     var allCharStyles = doc.allCharacterStyles; // Get array of all character styles
+
+    $.writeln("TEST: Checking for character styles,");
+    $.writeln("Count of all character Styles is " + allCharStyles.length);
+    $.writeln("TEST: Checking for paragraph styles,");
     $.writeln("Count of all P Styles is " + allParaStyles.length);
 
     // FUNCTION DEFINITIONS
@@ -289,12 +277,12 @@ function myMain() {
 
             // Character Styles to replace
             //-------------------------------------------------------------------
-            
             //replaceParaStyle("Heading 1", "Heading Lv 1");
             //replaceParaStyle("H2-remap", "Heading Lv 2");
             //replaceParaStyle("Normal (Web)", "Body Text (Base)");
+            
         } catch (e) {
-            // Print error if it didn't work
+            // Print error if paragraph styles
             throw e;
         }
     }

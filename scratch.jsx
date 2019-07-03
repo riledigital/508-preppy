@@ -1,4 +1,22 @@
+// RESOURCES
+//--------------------------------
+/*
+API Documentation available at
+http://jongware.mit.edu/idcsjs5.5/pc_ParagraphStyle.html
 
+https://marketplace.visualstudio.com/items?itemName=Adobe.extendscript-debug
+
+https://code.visualstudio.com/api/extension-guides/debugger-extension
+
+https://stackoverflow.com/questions/8545497/console-log-with-photoshop-scripting-extendedscript-toolkit
+
+https://graphicdesign.stackexchange.com/questions/56175/indesign-script-to-replace-paragraph-style
+
+TODO: implement some of these grep replacements
+https://indesignsecrets.com/favorite-grep-expressions-you-can-use.php
+
+*/
+//--------------------------------
 
 // BEFORE
 /* ------------------------------
