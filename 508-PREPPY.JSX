@@ -46,263 +46,261 @@ https://graphicdesign.stackexchange.com/questions/56175/indesign-script-to-repla
 // Re-map old styles to new ones
 /// https://forums.adobe.com/thread/885625
 
+// Do it all
 myMain();
 
-function myMain() {}
-// Variable assignments for easy access
-var doc = app.activeDocument; // Get the current document
-var allParaStyles = doc.allParagraphStyles; // Get array of all paragraph styles
-var allCharStyles = doc.allCharacterStyles; // Get array of all character styles
-$.writeln("Count of all P Styles is " + allParaStyles.length);
+// myMain is the main function that encapsulates this script 
+// prevent scope creep and accidentally overwritting global scope
+function myMain() {
+    // Variable assignments for easy access
+    var doc = app.activeDocument; // Get the current document
+    var allParaStyles = doc.allParagraphStyles; // Get array of all paragraph styles
+    var allCharStyles = doc.allCharacterStyles; // Get array of all character styles
+    $.writeln("Count of all P Styles is " + allParaStyles.length);
 
-function printAllParaStyles() {
-    for (i = 0; i < allParaStyles.length; i++) {
-        var current = allParaStyles[i];
-        $.writeln(current.name);
-    }
-}
-
-function printAllCharStyles() {
-    for (i = 0; i < allCharStyles.length; i++) {
-        var current = allCharStyles[i];
-        $.writeln(current.name);
-    }
-}
-
-// FUNCTION DEFINITIONS
-//----------------------------------------------------------------
-
-function updateMetadata(p-auth, p-title) {
-// From Adobe guide, "Adobe InDesign CS6 JavaScript Scripting Guide"
-    var myDocument = app.documents.add();
-    with(myDocument.metadataPreferences) {
-        author = "p-auth";
-        // copyrightStatus = CopyrightStatus.yes;
-        description = "";
-        documentTitle = "p-title";
-        // jobName = "XMP_Example_2003";
-        // keywords = ["animal", "mineral", "vegetable"];
-        //The metadata preferences object also includes the read-only
-        //creator, format, creationDate, modificationDate, and serverURL
-        //properties that are automatically entered and maintained by InDesign.
-        //Create a custom XMP container, "email"
-        //var myNewContainer = createContainerItem("http://ns.adobe.com/xap/1.0/", "email");
-        //setProperty("http://ns.adobe.com/xap/1.0/", "email/*[1]", "someone@adobe.com");
-    }
-}
-
-function myFindGrep(myObject, myFindPreferences, myChangePreferences, myFindChangeOptions) {
-    //Reset the find/change grep preferences before each search.
-    app.changeGrepPreferences = NothingEnum.nothing;
-    app.findGrepPreferences = NothingEnum.nothing;
-    var myString = "app.findGrepPreferences.properties = " + myFindPreferences + ";";
-    myString += "app.changeGrepPreferences.properties = " + myChangePreferences + ";";
-    myString += "app.findChangeGrepOptions.properties = " + myFindChangeOptions + ";";
-    app.doScript(myString, ScriptLanguage.javascript);
-    var myFoundItems = myObject.changeGrep();
-    //Reset the find/change grep preferences after each search.
-    app.changeGrepPreferences = NothingEnum.nothing;
-    app.findGrepPreferences = NothingEnum.nothing;
-}
-
-// Replaces paragraph styles by deleting them
-function replaceParaStyle(before, after) {
-    try {
-        //$.write(doc.allParagraphStyles.item(after));
-        //var afterStyle = app.activeDocument.paragraphStyles.item(after);
-        var styleObjectBefore = getStyleByFQN(before, app.activeDocument);
-        var styleObjectID = styleObjectBefore.id; // use the ID to remap styles
-        var styleObjectAfter = getStyleByFQN(after, app.activeDocument);
-        // You can get the style FQN when you have a style object like this.
-        // var styleFQN = getStyleFullyQualifiedName(styleObjectAfter);
-        app.activeDocument.paragraphStyles.itemByID(styleObjectID).remove(styleObjectAfter);
-    } catch (e) {
-        alert(e);
-    }
-}
-
-// Replaces character styles by deleting them
-// Replaces paragraph styles by deleting them
-function replaceCharStyle(before, after) {
-    try {
-        //$.write(doc.allParagraphStyles.item(after));
-        //var afterStyle = app.activeDocument.paragraphStyles.item(after);
-        var styleObjectBefore = getCharStyleWithFQN(before, app.activeDocument);
-        var styleObjectID = styleObjectBefore.id; // use the ID to remap styles
-        var styleObjectAfter = getCharStyleWithFQN(after, app.activeDocument);
-        // You can get the style FQN when you have a style object like this.
-        // var styleFQN = getStyleFullyQualifiedName(styleObjectAfter);
-        app.activeDocument.paragraphStyles.itemByID(styleObjectID).remove(styleObjectAfter);
-    } catch (e) {
-        alert(e);
-    }
-}
-
-
-// Function from 
-// https://stackoverflow.com/posts/24831911/revisionsv
-// getStyleFullyQualifiedName allow you to retrieve the style FQN,
-// by providing a style object. Combine the name of the style and
-// groups together separated by pipe (|).
-function getStyleFullyQualifiedName(object) {
-    var objectName = object.name;
-
-    if (object.parent.constructor.name != "Document") {
-        return getStyleFullyQualifiedName(object.parent) + "|" + objectName;
+    // FUNCTION DEFINITIONS
+    //----------------------------------------------------------------
+    function printAllParaStyles() {
+        for (i = 0; i < allParaStyles.length; i++) {
+            var current = allParaStyles[i];
+            $.writeln(current.name);
+        }
     }
 
-    return objectName;
-}
+    function printAllCharStyles() {
+        for (i = 0; i < allCharStyles.length; i++) {
+            var current = allCharStyles[i];
+            $.writeln(current.name);
+        }
+    }
 
-function getStyleByFQN(paragraphStyleFQN, document) {
-    var tmp = paragraphStyleFQN.split("|");
+    function updateMetadata(p - auth, p - title) {
+        // From Adobe guide, "Adobe InDesign CS6 JavaScript Scripting Guide"
+        var myDocument = app.documents.add();
+        with(myDocument.metadataPreferences) {
+            author = "p-auth";
+            // copyrightStatus = CopyrightStatus.yes;
+            description = "";
+            documentTitle = "p-title";
+            // jobName = "XMP_Example_2003";
+            // keywords = ["animal", "mineral", "vegetable"];
+            //The metadata preferences object also includes the read-only
+            //creator, format, creationDate, modificationDate, and serverURL
+            //properties that are automatically entered and maintained by InDesign.
+            //Create a custom XMP container, "email"
+            //var myNewContainer = createContainerItem("http://ns.adobe.com/xap/1.0/", "email");
+            //setProperty("http://ns.adobe.com/xap/1.0/", "email/*[1]", "someone@adobe.com");
+        }
+    }
 
-    var object = document;
+    // Perform text-based search and replaces
+    // function ripped from Adobe example;
+    function myFindGrep(myObject, myFindPreferences, myChangePreferences, myFindChangeOptions) {
+        //Reset the find/change grep preferences before each search.
+        app.changeGrepPreferences = NothingEnum.nothing;
+        app.findGrepPreferences = NothingEnum.nothing;
+        var myString = "app.findGrepPreferences.properties = " + myFindPreferences + ";";
+        myString += "app.changeGrepPreferences.properties = " + myChangePreferences + ";";
+        myString += "app.findChangeGrepOptions.properties = " + myFindChangeOptions + ";";
+        app.doScript(myString, ScriptLanguage.javascript);
+        var myFoundItems = myObject.changeGrep();
+        //Reset the find/change grep preferences after each search.
+        app.changeGrepPreferences = NothingEnum.nothing;
+        app.findGrepPreferences = NothingEnum.nothing;
+    }
 
-    for (var i = 0; i < (tmp.length - 1); i++) {
-        if (object.isValid) {
-            object = object.paragraphStyleGroups.itemByName(tmp[i]);
-        } else {
+    // Replaces paragraph styles by deleting them
+    function replaceParaStyle(before, after) {
+        try {
+            //$.write(doc.allParagraphStyles.item(after));
+            //var afterStyle = app.activeDocument.paragraphStyles.item(after);
+            var styleObjectBefore = getStyleByFQN(before, app.activeDocument);
+            var styleObjectID = styleObjectBefore.id; // use the ID to remap styles
+            var styleObjectAfter = getStyleByFQN(after, app.activeDocument);
+            // You can get the style FQN when you have a style object like this.
+            // var styleFQN = getStyleFullyQualifiedName(styleObjectAfter);
+            app.activeDocument.paragraphStyles.itemByID(styleObjectID).remove(styleObjectAfter);
+        } catch (e) {
+            alert(e);
+        }
+    }
+
+    // Replaces character styles by deleting them
+    // Replaces paragraph styles by deleting them
+    function replaceCharStyle(before, after) {
+        try {
+            //$.write(doc.allParagraphStyles.item(after));
+            //var afterStyle = app.activeDocument.paragraphStyles.item(after);
+            var styleObjectBefore = getCharStyleWithFQN(before, app.activeDocument);
+            var styleObjectID = styleObjectBefore.id; // use the ID to remap styles
+            var styleObjectAfter = getCharStyleWithFQN(after, app.activeDocument);
+            // You can get the style FQN when you have a style object like this.
+            // var styleFQN = getStyleFullyQualifiedName(styleObjectAfter);
+            app.activeDocument.paragraphStyles.itemByID(styleObjectID).remove(styleObjectAfter);
+        } catch (e) {
+            alert(e);
+        }
+    }
+
+    // Function from 
+    // https://stackoverflow.com/posts/24831911/revisionsv
+    // getStyleFullyQualifiedName allow you to retrieve the style FQN,
+    // by providing a style object. Combine the name of the style and
+    // groups together separated by pipe (|).
+    function getStyleFullyQualifiedName(object) {
+        var objectName = object.name;
+
+        if (object.parent.constructor.name != "Document") {
+            return getStyleFullyQualifiedName(object.parent) + "|" + objectName;
+        }
+
+        return objectName;
+    }
+
+    function getStyleByFQN(paragraphStyleFQN, document) {
+        var tmp = paragraphStyleFQN.split("|");
+
+        var object = document;
+
+        for (var i = 0; i < (tmp.length - 1); i++) {
+            if (object.isValid) {
+                object = object.paragraphStyleGroups.itemByName(tmp[i]);
+            } else {
+                return null;
+            }
+        }
+        if (!object.isValid) {
             return null;
         }
-    }
-    if (!object.isValid) {
-        return null;
-    }
-    object = object.paragraphStyles.itemByName(tmp[(tmp.length - 1)]);
-    if (!object.isValid) {
-        return null;
-    }
-    return object;
-}
-
-function getCharStyleFQN(object) {
-    var objectName = object.name;
-
-    if (object.parent.constructor.name != "Document") {
-        return getStyleFullyQualifiedName(object.parent) + "|" + objectName;
+        object = object.paragraphStyles.itemByName(tmp[(tmp.length - 1)]);
+        if (!object.isValid) {
+            return null;
+        }
+        return object;
     }
 
-    return objectName;
-}
+    function getCharStyleFQN(object) {
+        var objectName = object.name;
 
-function getCharStyleWithFQN(styleFQN, document) {
-    var tmp = styleFQN.split("|");
-    var object = document;
-    for (var i = 0; i < (tmp.length - 1); i++) {
-        if (object.isValid) {
-            object = object.characterStyleGroups.itemByName(tmp[i]);
-        } else {
-            throw "Invalid char style name.";
+        if (object.parent.constructor.name != "Document") {
+            return getStyleFullyQualifiedName(object.parent) + "|" + objectName;
+        }
+
+        return objectName;
+    }
+
+    function getCharStyleWithFQN(styleFQN, document) {
+        var tmp = styleFQN.split("|");
+        var object = document;
+        for (var i = 0; i < (tmp.length - 1); i++) {
+            if (object.isValid) {
+                object = object.characterStyleGroups.itemByName(tmp[i]);
+            } else {
+                throw "Invalid char style name.";
+            }
+        }
+        if (!object.isValid) {
+            throw "Invalid char style object";
+        }
+        object = object.characterStyles.itemByName(tmp[(tmp.length - 1)]);
+        if (!object.isValid) {
+            throw "Invalid char style";
+        }
+        return object;
+    }
+
+    function findChangeBasicPara() {
+        app.findGrepPreferences = null;
+        app.findGrepPreferences.appliedParagraphStyle = "[Basic Paragraph]";
+        var myResults = app.activeDocument.findGrep();
+        for (i = 0; i < myResults.length; i++) {
+            myResults[i].parentStory.paragraphs.nextItem(myResults[i].paragraphs[0]).appliedParagraphStyle = "";
         }
     }
-    if (!object.isValid) {
-        throw "Invalid char style object";
+
+    function processParaStyles() {
+        //Assuming you have a style "Heading 1" under group "Title" and "Center.
+        //You can retrieve the style object like this.
+        //var styleObject = getStyleByFQN("remapped|H2-remap", app.activeDocument);
+        //You can get the style FQN when you have a style object like this.
+        //var styleFQN = getStyleFullyQualifiedName(styleObject);
+        //alert("Valid: " + styleObject.isValid + " styleFQN: " + styleFQN);
+        try {
+            // $.writeln("All Character Styles: ");
+            // printAllCharStyles();
+            // $.writeln("END ---------------- ");
+            //
+            // printAllParaStyles();
+
+            // https://stackoverflow.com/questions/19302941/how-to-reference-styles-properly-in-indesign-scripting  
+            // Body Paragraphs
+
+            /*
+            replaceParaStyle("box", "Body|Body Text (Base)");
+            replaceParaStyle("Block Text1", "Body|Body Text (Base)");
+            replaceParaStyle("Normal", "Body|Body Text (Base)");
+            replaceParaStyle("Normal  (Web)", "Body|Body Text (Base)");
+            replaceParaStyle("Default", "Body|Body Text (Base)");
+            replaceParaStyle("Multi-level List 1", "Lists|List Bullet");
+            replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
+            replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
+            replaceParaStyle("List Paragraph", "Body|Body Text (Base)");
+
+            replaceParaStyle("Slide Captions", "Asides|Aside Box - Body");
+            */
+
+            // Headings
+
+            // replaceParaStyle("Heading 1", "Headings|Heading Lv 1");
+            // TODO: Figure out a way to select before style in a group using FQN
+            // Find and replace a bunch of [basic paragraphs] to the Body Text (Base) style... 
+            findChangeBasicPara();
+            // replaceParaStyle("[Basic Paragraph]", "Body|Body Text (Base");
+            // replaceParaStyle("remapped|H1-remap", "Headings|Heading Lv 1");
+            //  replaceParaStyle("remapped|H2-remap", "Headings|Heading Lv 2");
+            /*
+            replaceParaStyle("Heading 2", "Headings|Heading Lv 2");
+            replaceParaStyle("Heading 2.0", "Headings|Heading Lv 2");
+            replaceParaStyle("Heading 3", "Headings|Heading Lv 3");
+            */
+            // Character Styles to replace
+            //-------------------------------------------------------------------
+
+            rc();
+            function rc() {
+                replaceCharStyle('Body Bold', '');
+                replaceCharStyle('Caption', '');
+                replaceCharStyle('Heading 1 Char', '');
+                replaceCharStyle('Body', '');
+                replaceCharStyle('Box', '');
+                replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', '');
+                replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', '');
+            }
+
+            /*  
+            Body Bold
+            Caption
+            Heading 1 Char
+            Body
+            Box
+            Styles for Word/RTF Imported Lists|Word Imported List Style1
+            Styles for Word/RTF Imported Lists|Word Imported List Style2
+            */
+
+            // Character Styles to replace
+            //-------------------------------------------------------------------
+            
+            //replaceParaStyle("Heading 1", "Heading Lv 1");
+            //replaceParaStyle("H2-remap", "Heading Lv 2");
+            //replaceParaStyle("Normal (Web)", "Body Text (Base)");
+        } catch (e) {
+            // Print error if it didn't work
+            throw e;
+        }
     }
-    object = object.characterStyles.itemByName(tmp[(tmp.length - 1)]);
-    if (!object.isValid) {
-        throw "Invalid char style";
-    }
-    return object;
-}
 
-
-function findChangeBasicPara() {
-    app.findGrepPreferences = null;
-    app.findGrepPreferences.appliedParagraphStyle = "[Basic Paragraph]";
-    var myResults = app.activeDocument.findGrep();
-    for (i = 0; i < myResults.length; i++) {
-        myResults[i].parentStory.paragraphs.nextItem(myResults[i].paragraphs[0]).appliedParagraphStyle = "";
-    }
-}
-//Assuming you have a style "Heading 1" under group "Title" and "Center.
-//You can retrieve the style object like this.
-//var styleObject = getStyleByFQN("remapped|H2-remap", app.activeDocument);
-//You can get the style FQN when you have a style object like this.
-//var styleFQN = getStyleFullyQualifiedName(styleObject);
-
-//alert("Valid: " + styleObject.isValid + " styleFQN: " + styleFQN);
-
-// List of styles to replace programmatically:
-// SCRIPT BEGINS
-//-------------------------------//--------------------------------//--------------------------------
-try {
-    // $.writeln("All Character Styles: ");
-    // printAllCharStyles();
-    // $.writeln("END ---------------- ");
-    //
-    // printAllParaStyles();
-
-    // https://stackoverflow.com/questions/19302941/how-to-reference-styles-properly-in-indesign-scripting  
-    // Body Paragraphs
-
-    /*
-  replaceParaStyle("box", "Body|Body Text (Base)");
-  replaceParaStyle("Block Text1", "Body|Body Text (Base)");
-  replaceParaStyle("Normal", "Body|Body Text (Base)");
-  replaceParaStyle("Normal  (Web)", "Body|Body Text (Base)");
-  replaceParaStyle("Default", "Body|Body Text (Base)");
-  replaceParaStyle("Multi-level List 1", "Lists|List Bullet");
-  replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
-  replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
-  replaceParaStyle("List Paragraph", "Body|Body Text (Base)");
-
-  replaceParaStyle("Slide Captions", "Asides|Aside Box - Body");
-*/
-
-    // Headings
-
-    // replaceParaStyle("Heading 1", "Headings|Heading Lv 1");
-    // TODO: Figure out a way to select before style in a group using FQN
-    // Find and replace a bunch of [basic paragraphs] to the Body Text (Base) style... 
-    findChangeBasicPara();
-    // replaceParaStyle("[Basic Paragraph]", "Body|Body Text (Base");
-    // replaceParaStyle("remapped|H1-remap", "Headings|Heading Lv 1");
-    //  replaceParaStyle("remapped|H2-remap", "Headings|Heading Lv 2");
-    /*
-    replaceParaStyle("Heading 2", "Headings|Heading Lv 2");
-    replaceParaStyle("Heading 2.0", "Headings|Heading Lv 2");
-    replaceParaStyle("Heading 3", "Headings|Heading Lv 3");
-    */
-    // Character Styles to replace
-    //-------------------------------------------------------------------
-    
-    //rc();
-    function rc() {
-        replaceCharStyle('Body Bold', '');
-        replaceCharStyle('Caption', '');
-        replaceCharStyle('Heading 1 Char', '');
-        replaceCharStyle('Body', '');
-        replaceCharStyle('Box', '');
-        replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', '');
-        replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', '');
-    }
-
-    /*  
-    Body Bold
-    Caption
-    Heading 1 Char
-    Body
-    Box
-    Styles for Word/RTF Imported Lists|Word Imported List Style1
-    Styles for Word/RTF Imported Lists|Word Imported List Style2
-    */
-    // Character Styles to replace
-    //-------------------------------------------------------------------
-
-
-    //replaceParaStyle("Heading 1", "Heading Lv 1");
-    //replaceParaStyle("H2-remap", "Heading Lv 2");
-    //replaceParaStyle("Normal (Web)", "Body Text (Base)");
-} catch (e) {
-    // Print error if it didn't work
-    throw e;
-}
-
-
-
-
-updateMetadata("FEMA", "Document Title");
-
-alert("Finished script");
+    // Run the task functions
+    updateMetadata("FEMA", "Document Title");
+    processParaStyles();
+    alert("Finished script");
 }
