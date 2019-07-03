@@ -72,26 +72,23 @@ function printAllCharStyles() {
 // FUNCTION DEFINITIONS
 //----------------------------------------------------------------
 
-function updateMetadata() {
-
+function updateMetadata(p-auth, p-title) {
+// From Adobe guide, "Adobe InDesign CS6 JavaScript Scripting Guide"
     var myDocument = app.documents.add();
     with(myDocument.metadataPreferences) {
-        author = "Adobe";
-        copyrightInfoURL = "http://www.adobe.com";
-        copyrightNotice = "This document is copyrighted.";
-        copyrightStatus = CopyrightStatus.yes;
-        description = "Example of xmp metadata scripting in InDesign CS";
-        documentTitle = "XMP Example";
-        jobName = "XMP_Example_2003";
-        keywords = ["animal", "mineral", "vegetable"];
+        author = "p-auth";
+        // copyrightStatus = CopyrightStatus.yes;
+        description = "";
+        documentTitle = "p-title";
+        // jobName = "XMP_Example_2003";
+        // keywords = ["animal", "mineral", "vegetable"];
         //The metadata preferences object also includes the read-only
         //creator, format, creationDate, modificationDate, and serverURL
         //properties that are automatically entered and maintained by InDesign.
         //Create a custom XMP container, "email"
-        var myNewContainer = createContainerItem("http://ns.adobe.com/xap/1.0/", "email");
-        setProperty("http://ns.adobe.com/xap/1.0/", "email/*[1]", "someone@adobe.com");
+        //var myNewContainer = createContainerItem("http://ns.adobe.com/xap/1.0/", "email");
+        //setProperty("http://ns.adobe.com/xap/1.0/", "email/*[1]", "someone@adobe.com");
     }
-
 }
 
 function myFindGrep(myObject, myFindPreferences, myChangePreferences, myFindChangeOptions) {
@@ -269,6 +266,7 @@ try {
     */
     // Character Styles to replace
     //-------------------------------------------------------------------
+    
     //rc();
     function rc() {
         replaceCharStyle('Body Bold', '');
@@ -301,62 +299,10 @@ try {
     throw e;
 }
 
+
+
+
+updateMetadata("FEMA", "Document Title");
+
 alert("Finished script");
-
-// BEFORE
-/* ------------------------------
-[No Paragraph Style]
-[Basic Paragraph]
-Slide Captions
-Normal
-Multi-level List 1
-Multi-level List 2
-Heading 1
-slide caption
-box
-List Bullet
-Heading 2.0
-Block Text1
-Body Text
-Default
-Heading 2
-Heading 3
-List Paragraph
-Block Text3
------------------------------- */
-
-// AFTER 
-/* ------------------------------
-[No Paragraph Style]
-[Basic Paragraph]
-Aside Box - Body
-Aside Box - Heading
-Body Text (Base)
-Question
-Checklist
-Checklist - Checked
-Fill-in Ruled
-Fill-in Ruled with Checkboxes
-Heading Lv 1
-Heading Lv 2
-Heading Lv 3
-Definition List - Definition
-Definition List - Description
-List Bullet
-List Bullet - Small Text
-List Numbered
-Running Header - Document Title
-Footer - Page Num and Date
-Tabular Body
-Tabular - Numbers, Right-Aligned
-Tabular Heading
-Cover Title
-TOC Listing Level 1
-TOC Listing Level 2
-Caption
-Reference Item
-Normal
-H2-remap
------------------------------- */
-
 }
