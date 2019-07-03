@@ -73,3 +73,16 @@ Reference Item
 Normal
 H2-remap
 ------------------------------ */
+
+// code scraps
+// Toggle code
+/*
+if (myCond.visible) {
+    $.writeln("Toggling " + myCondName + "to false");
+    myCond.visible = 0;
+} else if (!myCond.visible) {
+    $.writeln("Toggling " + myCondName + "to true");
+    myCond.visible = 1;
+}
+*/
+//$.writeln("condition: " + myCondName);

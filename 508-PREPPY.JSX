@@ -62,14 +62,14 @@ function myMain() {
         }
     }
 
-    function updateMetadata(p - auth, p - title) {
+    function updateMetadata(pauth, ptitle) {
         // From Adobe guide, "Adobe InDesign CS6 JavaScript Scripting Guide"
-        var myDocument = app.documents.add();
-        with(myDocument.metadataPreferences) {
-            author = "p-auth";
+        //var myDocument = app.documents.add();
+        with(doc.metadataPreferences) {
+            author = pauth;
             // copyrightStatus = CopyrightStatus.yes;
             description = "";
-            documentTitle = "p-title";
+            documentTitle = ptitle;
             // jobName = "XMP_Example_2003";
             // keywords = ["animal", "mineral", "vegetable"];
             //The metadata preferences object also includes the read-only
@@ -83,19 +83,20 @@ function myMain() {
 
     // Perform text-based search and replaces
     // function ripped from Adobe example;
-    function myFindGrep(myObject, myFindPreferences, myChangePreferences, myFindChangeOptions) {
-        //Reset the find/change grep preferences before each search.
-        app.changeGrepPreferences = NothingEnum.nothing;
-        app.findGrepPreferences = NothingEnum.nothing;
-        var myString = "app.findGrepPreferences.properties = " + myFindPreferences + ";";
-        myString += "app.changeGrepPreferences.properties = " + myChangePreferences + ";";
-        myString += "app.findChangeGrepOptions.properties = " + myFindChangeOptions + ";";
-        app.doScript(myString, ScriptLanguage.javascript);
-        var myFoundItems = myObject.changeGrep();
-        //Reset the find/change grep preferences after each search.
-        app.changeGrepPreferences = NothingEnum.nothing;
-        app.findGrepPreferences = NothingEnum.nothing;
-    }
+
+    // function myFindGrep(myObject, myFindPreferences, myChangePreferences, myFindChangeOptions) {
+    //     //Reset the find/change grep preferences before each search.
+    //     app.changeGrepPreferences = NothingEnum.nothing;
+    //     app.findGrepPreferences = NothingEnum.nothing;
+    //     var myString = "app.findGrepPreferences.properties = " + myFindPreferences + ";";
+    //     myString += "app.changeGrepPreferences.properties = " + myChangePreferences + ";";
+    //     myString += "app.findChangeGrepOptions.properties = " + myFindChangeOptions + ";";
+    //     app.doScript(myString, ScriptLanguage.javascript);
+    //     var myFoundItems = myObject.changeGrep();
+    //     //Reset the find/change grep preferences after each search.
+    //     app.changeGrepPreferences = NothingEnum.nothing;
+    //     app.findGrepPreferences = NothingEnum.nothing;
+    // }
 
     // Replaces paragraph styles by deleting them
     function replaceParaStyle(before, after) {
@@ -137,11 +138,9 @@ function myMain() {
     // groups together separated by pipe (|).
     function getStyleFullyQualifiedName(object) {
         var objectName = object.name;
-
         if (object.parent.constructor.name != "Document") {
             return getStyleFullyQualifiedName(object.parent) + "|" + objectName;
         }
-
         return objectName;
     }
 
@@ -255,7 +254,9 @@ function myMain() {
             //-------------------------------------------------------------------
 
             rc();
+
             function rc() {
+                // TODO: does it work to replace with empty style???... 
                 replaceCharStyle('Body Bold', '');
                 replaceCharStyle('Caption', '');
                 replaceCharStyle('Heading 1 Char', '');
@@ -264,7 +265,6 @@ function myMain() {
                 replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', '');
                 replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', '');
             }
-
             /*  
             Body Bold
             Caption
@@ -280,15 +280,44 @@ function myMain() {
             //replaceParaStyle("Heading 1", "Heading Lv 1");
             //replaceParaStyle("H2-remap", "Heading Lv 2");
             //replaceParaStyle("Normal (Web)", "Body Text (Base)");
-            
         } catch (e) {
             // Print error if paragraph styles
             throw e;
         }
     }
 
+    // Book Processing
+    // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
+    function orchestrateBook() {
+        $.writeln("orchestrateBook");
+    }
+
+    function syncBook() {
+        $.writeln("syncBook");
+    }
+
+    // Change condition for the desired output...
+    function changeCondition(conditionName, bool) {
+        try {
+            typeof conditionName === 'String';
+        } catch (e) {
+            alert(e);
+        }
+        app.activeDocument.conditions.add({'name' : conditionName, });
+        myCond = app.activeDocument.conditions.itemByName(conditionName.toString());
+        // if (myCond.name == null) {
+        //     $.writeln("invalid name, making a new condition");
+        //         app.activeDocument.conditions.add({'name' : conditionName, });
+        // } else {
+        //    myCondName = myCond.name;
+        // }
+        //myCond.visible = bool;
+    }
+
     // Run the task functions
-    updateMetadata("FEMA", "Document Title");
-    processParaStyles();
+    //updateMetadata("FEMA", "Instructor Guide?");
+    //processParaStyles();
+    changeCondition("IG", 1);
+    changeCondition("PG", 0);
     alert("Finished script");
 }
