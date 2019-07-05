@@ -81,6 +81,14 @@ function myMain() {
         }
     }
 
+    function setAltText() {
+        // Sets all alt text to XMP:Description
+        // Loop thru all image objects
+        for (i = 0; i < app.activeDocument.allGraphics.length; i++) {
+            img = app.activeDocument.allGraphics[i]
+            img.parent.objectExportOptions.altTextSourceType = SourceType.SOURCE_XMP_DESCRIPTION;
+        }
+    }
     // Perform text-based search and replaces
     // function ripped from Adobe example;
 
@@ -289,11 +297,23 @@ function myMain() {
     // Book Processing
     // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
     function orchestrateBook() {
+        changeCondition();
+        syncBook();
+        //TODO updateXRef();
+        //TODO exportPDFBook();
         $.writeln("orchestrateBook");
     }
 
+    function updateXRef() {
+        $.writeln("Initializing syncBook...");
+    }
+
+    function exportPDFBook() {
+        $.writeln("Initializing exportPDFBook...");
+    }
+
     function syncBook() {
-        $.writeln("syncBook");
+        $.writeln("Initializing syncBook...");
     }
 
     // Change condition for the desired output...
@@ -303,7 +323,9 @@ function myMain() {
         } catch (e) {
             alert(e);
         }
-        app.activeDocument.conditions.add({'name' : conditionName, });
+        app.activeDocument.conditions.add({
+            'name': conditionName,
+        });
         myCond = app.activeDocument.conditions.itemByName(conditionName.toString());
         // if (myCond.name == null) {
         //     $.writeln("invalid name, making a new condition");
@@ -315,9 +337,11 @@ function myMain() {
     }
 
     // Run the task functions
+
+    //setAltText();
     //updateMetadata("FEMA", "Instructor Guide?");
     //processParaStyles();
-    changeCondition("IG", 1);
-    changeCondition("PG", 0);
+    //changeCondition("IG", 1);
+    //changeCondition("PG", 0);
     alert("Finished script");
 }
