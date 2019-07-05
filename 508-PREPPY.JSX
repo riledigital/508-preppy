@@ -37,10 +37,10 @@ myMain();
 // prevent scope creep and accidentally overwritting global scope
 function myMain() {
     // Variable assignments for easy access
-    doc = app.activeDocument; // Get the current document
+    myDoc = app.activeDocument; // Get the current document
     myBook = app.activeBook;
-    allParaStyles = doc.allParagraphStyles; // Get array of all paragraph styles
-    allCharStyles = doc.allCharacterStyles; // Get array of all character styles
+    allParaStyles = myDoc.allParagraphStyles; // Get array of all paragraph styles
+    allCharStyles = myDoc.allCharacterStyles; // Get array of all character styles
 
     // setting script preferences
     app.scriptPreferences.enableRedraw = 0;
@@ -70,7 +70,7 @@ function myMain() {
     function updateMetadata(pauth, ptitle) {
         // From Adobe guide, "Adobe InDesign CS6 JavaScript Scripting Guide"
         //var myDocument = app.documents.add();
-        with(doc.metadataPreferences) {
+        with(myDoc.metadataPreferences) {
             author = pauth;
             // copyrightStatus = CopyrightStatus.yes;
             description = "";
@@ -114,7 +114,7 @@ function myMain() {
     // Replaces paragraph styles by deleting them
     function replaceParaStyle(before, after) {
         try {
-            //$.write(doc.allParagraphStyles.item(after));
+            //$.write(myDoc.allParagraphStyles.item(after));
             //var afterStyle = app.activeDocument.paragraphStyles.item(after);
             var styleObjectBefore = getStyleByFQN(before, app.activeDocument);
             var styleObjectID = styleObjectBefore.id; // use the ID to remap styles
@@ -131,7 +131,7 @@ function myMain() {
     // Replaces paragraph styles by deleting them
     function replaceCharStyle(before, after) {
         try {
-            //$.write(doc.allParagraphStyles.item(after));
+            //$.write(myDoc.allParagraphStyles.item(after));
             //var afterStyle = app.activeDocument.paragraphStyles.item(after);
             var styleObjectBefore = getCharStyleWithFQN(before, app.activeDocument);
             var styleObjectID = styleObjectBefore.id; // use the ID to remap styles
@@ -302,22 +302,22 @@ function myMain() {
     // Book Processing
     // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
     function orchestrateBook() {
-        //changeCondition();
-        syncBook();
-        //TODO updateXRef();
-        //TODO exportPDFBook();
-        $.writeln("orchestrateBook");
+        try {
+        $.writeln("Running orchestrateBook...");
+            //changeCondition();
+            makeVersion("IG");
+            makeVersion("PG");
+            //myBook.updateAllCrossReferences();
+        } catch (e) {
+            alert(e);
+        }
+        
     }
 
-    function updateXRef() {
-        myBook.updateAllCrossReferences();
-        $.writeln("Initializing syncBook...");
-    }
-
-    function exportPDFBook() {
-        myBook.exportFile(ExportFormat.INTERACTIVE_PDF,
-            'interactive');
-
+    function exportPDFBook(postfix) {
+        // myBook.exportFile(ExportFormat.INTERACTIVE_PDF, 'file.pdf');
+        myBook.exportFile(ExportFormat.PDF_TYPE,
+            File(app.books[0].filePath + "/" + app.books[0].name.replace(".indb", "-" + postfix + ".pdf")), false);
         $.writeln("Initializing exportPDFBook...");
     }
 
@@ -326,36 +326,54 @@ function myMain() {
         $.writeln("Initializing syncBook...");
     }
 
+    function makeVersion(version) {
+        $.writeln('Making ' + version + '...')
+        if (version == 'IG') {
+            changeCondition(version, true);
+            changeCondition('PG', false);
+            
+        } else if (version == 'PG') {
+            changeCondition(version, true);
+            changeCondition('IG', false);
+            
+        } else {
+            return false;
+        }
+        syncBook();
+        exportPDFBook(version);
+        return true;
+    }
+
     // Change condition for the desired output...
     function changeCondition(conditionName, bool) {
-        try {
-            typeof conditionName === 'String';
-        } catch (e) {
-            alert(e);
-        }
-        app.activeDocument.conditions.add({
-            'name': conditionName,
-        });
+        // try {
+        //     typeof conditionName === ;
+        // } catch (e) {
+        //     alert(e);
+        // }
+        // app.activeDocument.conditions.add({
+        //     'name': conditionName,
+        // });
+
         myCond = app.activeDocument.conditions.itemByName(conditionName.toString());
+
         // if (myCond.name == null) {
         //     $.writeln("invalid name, making a new condition");
         //         app.activeDocument.conditions.add({'name' : conditionName, });
         // } else {
         //    myCondName = myCond.name;
         // }
-        //myCond.visible = bool;
+        myCond.visible = bool;
     }
 
 
     // Run the task functions
-
-    syncBook();
-    //setAltText();
     //updateMetadata("FEMA", "Instructor Guide?");
     //processParaStyles();
     //changeCondition("IG", 1);
     //changeCondition("PG", 0);
 
+    orchestrateBook();
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");
