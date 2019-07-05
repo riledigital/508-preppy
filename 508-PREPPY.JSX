@@ -235,7 +235,7 @@ function myMain() {
             // https://stackoverflow.com/questions/19302941/how-to-reference-styles-properly-in-indesign-scripting  
             // Body Paragraphs
 
-            /*
+
             replaceParaStyle("box", "Body|Body Text (Base)");
             replaceParaStyle("Block Text1", "Body|Body Text (Base)");
             replaceParaStyle("Normal", "Body|Body Text (Base)");
@@ -247,37 +247,34 @@ function myMain() {
             replaceParaStyle("List Paragraph", "Body|Body Text (Base)");
 
             replaceParaStyle("Slide Captions", "Asides|Aside Box - Body");
-            */
+
 
             // Headings
 
             // replaceParaStyle("Heading 1", "Headings|Heading Lv 1");
             // TODO: Figure out a way to select before style in a group using FQN
             // Find and replace a bunch of [basic paragraphs] to the Body Text (Base) style... 
-            findChangeBasicPara();
-            // replaceParaStyle("[Basic Paragraph]", "Body|Body Text (Base");
-            // replaceParaStyle("remapped|H1-remap", "Headings|Heading Lv 1");
-            //  replaceParaStyle("remapped|H2-remap", "Headings|Heading Lv 2");
-            /*
+            // findChangeBasicPara();
+            //replaceParaStyle("[Basic Paragraph]", "Body|Body Text (Base");
+            replaceParaStyle("remapped|H1-remap", "Headings|Heading Lv 1");
+            replaceParaStyle("remapped|H2-remap", "Headings|Heading Lv 2");
+            replaceParaStyle("H2-remap", "Headings|Heading Lv 2");
+            replaceParaStyle("Heading 1", "Headings|Heading Lv 1");
             replaceParaStyle("Heading 2", "Headings|Heading Lv 2");
             replaceParaStyle("Heading 2.0", "Headings|Heading Lv 2");
             replaceParaStyle("Heading 3", "Headings|Heading Lv 3");
-            */
+            
             // Character Styles to replace
             //-------------------------------------------------------------------
 
-            rc();
-
-            function rc() {
-                // TODO: does it work to replace with empty style???... 
-                replaceCharStyle('Body Bold', '');
-                replaceCharStyle('Caption', '');
-                replaceCharStyle('Heading 1 Char', '');
-                replaceCharStyle('Body', '');
-                replaceCharStyle('Box', '');
-                replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', '');
-                replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', '');
-            }
+            // TODO: does it work to replace with empty style???... 
+            replaceCharStyle('Body Bold', 'Box');
+            replaceCharStyle('Caption', 'Box');
+            replaceCharStyle('Heading 1 Char', 'Box');
+            replaceCharStyle('Body', 'Box');
+            //replaceCharStyle('Box', 'Box');
+            replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', 'Box');
+            replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', 'Box');
             /*  
             Body Bold
             Caption
@@ -303,7 +300,7 @@ function myMain() {
     // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
     function orchestrateBook() {
         try {
-        $.writeln("Running orchestrateBook...");
+            $.writeln("Running orchestrateBook...");
             //changeCondition();
             makeVersion("IG");
             makeVersion("PG");
@@ -311,7 +308,7 @@ function myMain() {
         } catch (e) {
             alert(e);
         }
-        
+
     }
 
     function exportPDFBook(postfix) {
@@ -331,11 +328,11 @@ function myMain() {
         if (version == 'IG') {
             changeCondition(version, true);
             changeCondition('PG', false);
-            
+
         } else if (version == 'PG') {
             changeCondition(version, true);
             changeCondition('IG', false);
-            
+
         } else {
             return false;
         }
@@ -346,34 +343,16 @@ function myMain() {
 
     // Change condition for the desired output...
     function changeCondition(conditionName, bool) {
-        // try {
-        //     typeof conditionName === ;
-        // } catch (e) {
-        //     alert(e);
-        // }
-        // app.activeDocument.conditions.add({
-        //     'name': conditionName,
-        // });
-
         myCond = app.activeDocument.conditions.itemByName(conditionName.toString());
-
-        // if (myCond.name == null) {
-        //     $.writeln("invalid name, making a new condition");
-        //         app.activeDocument.conditions.add({'name' : conditionName, });
-        // } else {
-        //    myCondName = myCond.name;
-        // }
         myCond.visible = bool;
     }
 
-
-    // Run the task functions
-    //updateMetadata("FEMA", "Instructor Guide?");
+    // // Run the task functions
+    updateMetadata("FEMA", "Instructor Guide?");
     //processParaStyles();
-    //changeCondition("IG", 1);
-    //changeCondition("PG", 0);
+    //orchestrateBook();
+    processParaStyles();
 
-    orchestrateBook();
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");

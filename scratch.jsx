@@ -17,7 +17,36 @@ https://indesignsecrets.com/favorite-grep-expressions-you-can-use.php
 
 */
 //--------------------------------
+// with(app.pdfExportPreferences) {
+    //     //======Marks and Bleed
+    //     cropMarks = false;
+    //     bleedMarks = false;
+    //     registrationMarks = false;
+    //     colorBars = true;
+    //     pageInformationMarks = true;
 
+    //     //Default mark type.
+    //     // pdfMarkType = 1147563124;
+    //     // printerMarkWeight = PDFMarkWeight.P25PT
+    //     //pageMarksOffset = 5;
+    //     //useDocumentBleedWithPDF = true;
+    //     //includeSlugWithPDF = true;
+    // }
+
+    // newPreset = {
+    //     'colorBars': false,
+    //     'acrobatCompatibility': AcrobatCompatibility.ACROBAT_8,
+    //     //'standardsCompliance' : PDFXStandards.PDFX42010_STANDARD,
+    //     'pdfColorSpace': PDFColorSpace.CMYK,
+    //     'name': 'FEMA_Printers',
+    //     'includeStructure': true,
+    //     'includeHyperlinks': true,
+    //     'includeBookmarks': true,
+    //     'generateThumbnails': false
+    // }
+
+    //    app.pdfExportPresets.add(newPreset);
+    
 // BEFORE
 /* ------------------------------
 [No Paragraph Style]
