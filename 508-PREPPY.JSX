@@ -166,15 +166,18 @@ function myMain() {
             if (object.isValid) {
                 object = object.paragraphStyleGroups.itemByName(tmp[i]);
             } else {
-                return null;
+                throw "Error: style not found";
+                return false;
             }
         }
         if (!object.isValid) {
-            return null;
+            throw "Error: style not found";
+            return false;
         }
         object = object.paragraphStyles.itemByName(tmp[(tmp.length - 1)]);
         if (!object.isValid) {
-            return null;
+            throw "Error: style not found";
+            return false;
         }
         return object;
     }
@@ -263,7 +266,7 @@ function myMain() {
             replaceParaStyle("Heading 2", "Headings|Heading Lv 2");
             replaceParaStyle("Heading 2.0", "Headings|Heading Lv 2");
             replaceParaStyle("Heading 3", "Headings|Heading Lv 3");
-            
+
             // Character Styles to replace
             //-------------------------------------------------------------------
 
