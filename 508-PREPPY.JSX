@@ -33,13 +33,18 @@ SOFTWARE.
 // Do it all
 myMain();
 
-// myMain is the main function that encapsulates this script 
+// myMain is the main function that encapsulates this script
 // prevent scope creep and accidentally overwritting global scope
 function myMain() {
     // Variable assignments for easy access
-    var doc = app.activeDocument; // Get the current document
-    var allParaStyles = doc.allParagraphStyles; // Get array of all paragraph styles
-    var allCharStyles = doc.allCharacterStyles; // Get array of all character styles
+    doc = app.activeDocument; // Get the current document
+    myBook = app.activeBook;
+    allParaStyles = doc.allParagraphStyles; // Get array of all paragraph styles
+    allCharStyles = doc.allCharacterStyles; // Get array of all character styles
+
+    // setting script preferences
+    app.scriptPreferences.enableRedraw = 0;
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.neverInteract;
 
     $.writeln("TEST: Checking for character styles,");
     $.writeln("Count of all character Styles is " + allCharStyles.length);
@@ -297,7 +302,7 @@ function myMain() {
     // Book Processing
     // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
     function orchestrateBook() {
-        changeCondition();
+        //changeCondition();
         syncBook();
         //TODO updateXRef();
         //TODO exportPDFBook();
@@ -305,14 +310,19 @@ function myMain() {
     }
 
     function updateXRef() {
+        myBook.updateAllCrossReferences();
         $.writeln("Initializing syncBook...");
     }
 
     function exportPDFBook() {
+        myBook.exportFile(ExportFormat.INTERACTIVE_PDF,
+            'interactive');
+
         $.writeln("Initializing exportPDFBook...");
     }
 
     function syncBook() {
+        myBook.synchronize();
         $.writeln("Initializing syncBook...");
     }
 
@@ -336,12 +346,18 @@ function myMain() {
         //myCond.visible = bool;
     }
 
+
     // Run the task functions
 
+    syncBook();
     //setAltText();
     //updateMetadata("FEMA", "Instructor Guide?");
     //processParaStyles();
     //changeCondition("IG", 1);
     //changeCondition("PG", 0);
+
+    // reset script preferences and interaction...
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");
+
 }
