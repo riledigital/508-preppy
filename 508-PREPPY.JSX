@@ -162,21 +162,21 @@ function myMain() {
 
         var object = document;
 
-        for (var i = 0; i < (tmp.length - 1); i++) {
+        for (i = 0; i < (tmp.length - 1); i++) {
             if (object.isValid) {
                 object = object.paragraphStyleGroups.itemByName(tmp[i]);
             } else {
-                throw "Error: style not found";
+                throw "Error: can't find style" + paragraphStyleFQN;
                 return false;
             }
         }
         if (!object.isValid) {
-            throw "Error: style not found";
+            throw "Error: can't find style" + paragraphStyleFQN;
             return false;
         }
         object = object.paragraphStyles.itemByName(tmp[(tmp.length - 1)]);
         if (!object.isValid) {
-            throw "Error: style not found";
+            throw "Error: can't find style" + paragraphStyleFQN;
             return false;
         }
         return object;
@@ -195,7 +195,7 @@ function myMain() {
     function getCharStyleWithFQN(styleFQN, document) {
         var tmp = styleFQN.split("|");
         var object = document;
-        for (var i = 0; i < (tmp.length - 1); i++) {
+        for (i = 0; i < (tmp.length - 1); i++) {
             if (object.isValid) {
                 object = object.characterStyleGroups.itemByName(tmp[i]);
             } else {
@@ -238,7 +238,6 @@ function myMain() {
             // https://stackoverflow.com/questions/19302941/how-to-reference-styles-properly-in-indesign-scripting  
             // Body Paragraphs
 
-
             replaceParaStyle("box", "Body|Body Text (Base)");
             replaceParaStyle("Block Text1", "Body|Body Text (Base)");
             replaceParaStyle("Normal", "Body|Body Text (Base)");
@@ -248,13 +247,10 @@ function myMain() {
             replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
             replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
             replaceParaStyle("List Paragraph", "Body|Body Text (Base)");
-
             replaceParaStyle("Slide Captions", "Asides|Aside Box - Body");
-
+            replaceParaStyle("slide caption", "Body|Body Text (Base)");
 
             // Headings
-
-            // replaceParaStyle("Heading 1", "Headings|Heading Lv 1");
             // TODO: Figure out a way to select before style in a group using FQN
             // Find and replace a bunch of [basic paragraphs] to the Body Text (Base) style... 
             // findChangeBasicPara();
@@ -278,6 +274,8 @@ function myMain() {
             //replaceCharStyle('Box', 'Box');
             replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', 'Box');
             replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', 'Box');
+            replaceCharStyle('10 pt Body Bold White', 'Box');
+            replaceCharStyle('10 pt Body Bold Black', 'Box');
             /*  
             Body Bold
             Caption
@@ -299,14 +297,35 @@ function myMain() {
         }
     }
 
+    function assignGraphicAsides() {
+        var theObjectStyle = myDoc.objectStyles.itemByName("AsideGraphic");
+
+        function applyStyleTo(img) {
+            // https://forums.adobe.com/message/5718509#5718509
+            img.applyObjectStyle(theObjectStyle);
+            // alert(img.itemLink.name);
+        }
+
+        // https://forums.adobe.com/thread/885625
+
+        for (i = 0; i < app.activeDocument.allGraphics.length; i++) {
+            // Advisable to do some pre-selection here  
+            // For example:  
+            //if (app.activeDocument.allGraphics[i].imageTypeName != "TIFF")  
+            //{
+            applyStyleTo(app.activeDocument.allGraphics[i].parent);
+            //}  
+        }
+    }
+
     // Book Processing
     // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
     function orchestrateBook() {
         try {
             $.writeln("Running orchestrateBook...");
             //changeCondition();
-            makeVersion("IG");
-            makeVersion("PG");
+            makeVersion('Instructor Guide');
+            makeVersion('Participant Guide');
             //myBook.updateAllCrossReferences();
         } catch (e) {
             alert(e);
@@ -328,13 +347,13 @@ function myMain() {
 
     function makeVersion(version) {
         $.writeln('Making ' + version + '...')
-        if (version == 'IG') {
+        if (version == 'Instructor Guide') {
             changeCondition(version, true);
-            changeCondition('PG', false);
+            changeCondition('Participant Guide', false);
 
-        } else if (version == 'PG') {
+        } else if (version == 'Participant Guide') {
             changeCondition(version, true);
-            changeCondition('IG', false);
+            changeCondition('Instructor Guide', false);
 
         } else {
             return false;
@@ -351,11 +370,10 @@ function myMain() {
     }
 
     // // Run the task functions
-    updateMetadata("FEMA", "Instructor Guide?");
-    //processParaStyles();
-    //orchestrateBook();
-    processParaStyles();
-
+    //  updateMetadata("FEMA", "Course Title");
+    // orchestrateBook();
+    // processParaStyles();
+    assignGraphicAsides();
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");
