@@ -297,6 +297,29 @@ function myMain() {
         }
     }
 
+    // Grabbed from
+    // https://indesignsecrets.com/finding-empty-text-frames-in-indesign.php
+    function removeEmptyFrames() {
+        var myStories = app.activeDocument.stories.everyItem().getElements();
+        for (i = myStories.length - 1; i >= 0; i--) {
+            var myTextFrames = myStories[i].textContainers;
+            for (j = myTextFrames.length - 1; j >= 0; j--) {
+                if (myTextFrames[j].contents == "") {
+                    myTextFrames[j].remove();
+                }
+            }
+        }
+    }
+
+    function removeAllGraphicLines() {
+        myLines = myDoc.graphicLines;
+        // loop thru all lines
+        for (i = myLines.length - 1; i >= 0; i--) {
+            // delete all the graphic lines...
+            myLines[i].remove();
+        }
+    }
+
     function assignGraphicAsides() {
         var theObjectStyle = myDoc.objectStyles.itemByName("AsideGraphic");
 
@@ -368,14 +391,14 @@ function myMain() {
         myCond = app.activeDocument.conditions.itemByName(conditionName.toString());
         myCond.visible = bool;
     }
-
-    // // Run the task functions
-    //  updateMetadata("FEMA", "Course Title");
+    // Run the task functions
+    // updateMetadata("FEMA", "Course Title");
+    // removeEmptyFrames();
+    //removeAllGraphicLines();
     // orchestrateBook();
-    // processParaStyles();
-    assignGraphicAsides();
+     processParaStyles();
+    // assignGraphicAsides();
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");
-
 }
