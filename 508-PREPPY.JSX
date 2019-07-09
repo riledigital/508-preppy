@@ -2,18 +2,19 @@
 // Author:
 // Ri Le <r.le@columbia.edu>
 // Started June 2019
-// Re-map old styles to new ones
+// Helper script to speed up conversion to new layout
 /// https://forums.adobe.com/thread/885625
 
-// Do it all
 myMain();
-
-// myMain is the main function that encapsulates this script
 // prevent scope creep and accidentally overwritting global scope
 function myMain() {
     // Variable assignments for easy access
     myDoc = app.activeDocument; // Get the current document
-    myBook = app.activeBook;
+    try {
+        myBook = app.activeBook;
+    } catch (e) {
+        alert(e);
+    }
     allParaStyles = myDoc.allParagraphStyles; // Get array of all paragraph styles
     allCharStyles = myDoc.allCharacterStyles; // Get array of all character styles
 
@@ -197,27 +198,21 @@ function myMain() {
     }
 
     function processParaStyles() {
-        //Assuming you have a style "Heading 1" under group "Title" and "Center.
-        //You can retrieve the style object like this.
-        //var styleObject = getStyleByFQN("remapped|H2-remap", app.activeDocument);
-        //You can get the style FQN when you have a style object like this.
-        //var styleFQN = getStyleFullyQualifiedName(styleObject);
-        //alert("Valid: " + styleObject.isValid + " styleFQN: " + styleFQN);
+        // https://stackoverflow.com/questions/19302941/how-to-reference-styles-properly-in-indesign-scripting  
         try {
             // $.writeln("All Character Styles: ");
             // printAllCharStyles();
-            // $.writeln("END ---------------- ");
-            //
             // printAllParaStyles();
 
-            // https://stackoverflow.com/questions/19302941/how-to-reference-styles-properly-in-indesign-scripting  
             // Body Paragraphs
-
+            replaceParaStyle("Module Heading", "Body|Body Text (Base)");
+            replaceParaStyle("Body Text", "Body|Body Text (Base)");
             replaceParaStyle("box", "Body|Body Text (Base)");
             replaceParaStyle("Block Text1", "Body|Body Text (Base)");
             replaceParaStyle("Normal", "Body|Body Text (Base)");
             replaceParaStyle("Normal  (Web)", "Body|Body Text (Base)");
             replaceParaStyle("Default", "Body|Body Text (Base)");
+            replaceParaStyle("List Bullet", "Lists|List Bullet");
             replaceParaStyle("Multi-level List 1", "Lists|List Bullet");
             replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
             replaceParaStyle("Multi-level List 2", "Lists|List Bullet");
@@ -226,10 +221,8 @@ function myMain() {
             replaceParaStyle("slide caption", "Body|Body Text (Base)");
 
             // Headings
-            // TODO: Figure out a way to select before style in a group using FQN
-            // Find and replace a bunch of [basic paragraphs] to the Body Text (Base) style... 
+            // TODO Find and replace a bunch of [basic paragraphs] to the Body Text (Base) style... 
             // findChangeBasicPara();
-            //replaceParaStyle("[Basic Paragraph]", "Body|Body Text (Base");
             replaceParaStyle("remapped|H1-remap", "Headings|Heading Lv 1");
             replaceParaStyle("remapped|H2-remap", "Headings|Heading Lv 2");
             replaceParaStyle("H2-remap", "Headings|Heading Lv 2");
@@ -246,28 +239,16 @@ function myMain() {
             replaceCharStyle('Caption', 'Box');
             replaceCharStyle('Heading 1 Char', 'Box');
             replaceCharStyle('Body', 'Box');
-            //replaceCharStyle('Box', 'Box');
             replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style1', 'Box');
             replaceCharStyle('Styles for Word/RTF Imported Lists|Word Imported List Style2', 'Box');
             replaceCharStyle('10 pt Body Bold White', 'Box');
             replaceCharStyle('10 pt Body Bold Black', 'Box');
-            /*  
-            Body Bold
-            Caption
-            Heading 1 Char
-            Body
-            Box
-            Styles for Word/RTF Imported Lists|Word Imported List Style1
-            Styles for Word/RTF Imported Lists|Word Imported List Style2
-            */
-
-            // Character Styles to replace
-            //-------------------------------------------------------------------
+            replaceCharStyle('Box', ''); //hopefully just delete box style after all are reassigned
             //replaceParaStyle("Heading 1", "Heading Lv 1");
             //replaceParaStyle("H2-remap", "Heading Lv 2");
             //replaceParaStyle("Normal (Web)", "Body Text (Base)");
         } catch (e) {
-            // Print error if paragraph styles
+            // Throw error if paragraph styles
             throw e;
         }
     }
@@ -311,7 +292,10 @@ function myMain() {
             // For example:  
             //if (app.activeDocument.allGraphics[i].imageTypeName != "TIFF")  
             //{
-            applyStyleTo(app.activeDocument.allGraphics[i].parent);
+            activeGraphicFrame = app.activeDocument.allGraphics[i].parent;
+            // alert(activeGraphicFrame.pref);
+            // //if (activeGraphicFrame.values[0] )
+            applyStyleTo(activeGraphicFrame);
             //}  
         }
     }
@@ -332,15 +316,15 @@ function myMain() {
     }
 
     function exportPDFBook(postfix) {
+        $.writeln("Initializing exportPDFBook...");
         // myBook.exportFile(ExportFormat.INTERACTIVE_PDF, 'file.pdf');
         myBook.exportFile(ExportFormat.PDF_TYPE,
             File(app.books[0].filePath + "/" + app.books[0].name.replace(".indb", "-" + postfix + ".pdf")), false);
-        $.writeln("Initializing exportPDFBook...");
     }
 
     function syncBook() {
-        myBook.synchronize();
         $.writeln("Initializing syncBook...");
+        myBook.synchronize();
     }
 
     function makeVersion(version) {
@@ -371,8 +355,9 @@ function myMain() {
     // removeEmptyFrames();
     //removeAllGraphicLines();
     // orchestrateBook();
-     processParaStyles();
-    // assignGraphicAsides();
+    assignGraphicAsides();
+    processParaStyles();
+    
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");
