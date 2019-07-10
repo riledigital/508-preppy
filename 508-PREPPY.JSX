@@ -1,4 +1,5 @@
 // 508-PREPPY
+// functions for speeding up 508 compliance stuff
 // Author:
 // Ri Le <r.le@columbia.edu>
 // Started June 2019
@@ -103,8 +104,6 @@ function myMain() {
         }
     }
 
-    // Replaces character styles by deleting them
-    // Replaces paragraph styles by deleting them
     function replaceCharStyle(before, after) {
         try {
             //$.write(myDoc.allParagraphStyles.item(after));
@@ -327,6 +326,33 @@ function myMain() {
         myBook.synchronize();
     }
 
+    function setupPDFExportPreferences() {
+        // TODO: Figure out what features to enable for maximum PDF accessibility...
+        // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#PDFExportPreference.html
+        // TODO: Figure out how to define a preset
+        myDoc.pdfExportPreferences.pdfDisplayTitle = PdfDisplayTitleOptions.DISPLAY_DOCUMENT_TITLE;
+        myDoc.pdfExportPreferences.includeHyperlinks = true;
+        myDoc.pdfExportPreferences.includeStructure = true;
+        myDoc.pdfExportPreferences.cropImagesToFrames = true;
+        myDoc.pdfExportPreferences.standardsCompliance = PDFXStandards.NONE;
+        myDoc.pdfExportPreferences.pdfCompatibility = AcrobatCompatibility.ACROBAT_8;
+        myDoc.pdfExportPreferences.defaultDocumentLanguage = 'en';
+        myDoc.pdfExportPreferences.optimizePDF = true;
+        myDoc.pdfExportPreferences.generateThumbnails = true;
+        // Compression Settings
+        myDoc.pdfExportPreferences.compressTextAndLineArt = true;
+        myDoc.pdfExportPreferences.colorBitmapCompression = BitmapCompression.AUTO_COMPRESSION;
+        myDoc.pdfExportPreferences.colorBitmapQuality = CompressionQuality.HIGH;
+        myDoc.pdfExportPreferences.colorBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+        myDoc.pdfExportPreferences.colorBitmapSampling = 144;
+      myDoc.pdfExportPreferences.thresholdToCompressColor = 144;
+        myDoc.pdfExportPreferences.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
+      myDoc.pdfExportPreferences.monochromeBitmapSamplingDPI = 144;
+      myDoc.pdfExportPreferences.thresholdToCompressMonochrome = 144;
+        myDoc.pdfExportPreferences.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
+        myDoc.pdfExportPreferences.monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+    }
+
     function makeVersion(version) {
         $.writeln('Making ' + version + '...')
         if (version == 'Instructor Guide') {
@@ -357,7 +383,7 @@ function myMain() {
     // orchestrateBook();
     assignGraphicAsides();
     processParaStyles();
-    
+
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
     alert("Finished script");
