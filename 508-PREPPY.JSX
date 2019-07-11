@@ -431,15 +431,15 @@ function myMain() {
     
   }
 
-    // clearOverrides();
+    clearOverrides();
     // Run the task functions
-    // updateMetadata("FEMA", "Course Title");
-    // removeEmptyFrames();
-    // removeAllGraphicLines();
-    // // orchestrateBook();
+    updateMetadata// ("FEMA", "Course Title");
+    removeEmptyFrames();
+    removeAllGraphicLines();
+    // orchestrateBook();
     // assignGraphicAsides();
     processParaStyles();
-    // setupPDFExportPreferences();
+    setupPDFExportPreferences();
 
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
