@@ -240,7 +240,10 @@ function myMain() {
             replaceCharStyle('Box', ''); //hopefully just delete box style after all are reassigned
             //replaceParaStyle("Heading 1", "Heading Lv 1");
             //replaceParaStyle("H2-remap", "Heading Lv 2");
-            //replaceParaStyle("Normal (Web)", "Body Text (Base)");
+          //replaceParaStyle("Normal (Web)", "Body Text (Base)");
+          var boxStyleObject = getCharStyleWithFQN('Box', app.activeDocument);
+          var boxStyleID = boxStyleObject.id; 
+          app.activeDocument.paragraphStyles.itemByID(boxStyleID).remove();
         } catch (e) {
             // Throw error if paragraph styles
             throw e;
@@ -389,46 +392,54 @@ function myMain() {
         myCond.visible = bool;
     }
 
-  function clearOverrides() {
-    // Clear All Overrides
-    // Written by TAW. (c) 2014 by Bookraft Solutions, Israel (Id-Extras.com)
-    // Please do not delete this copyright notice.
+    function clearOverrides() {
+        // Clear All Overrides
+        // Written by TAW. (c) 2014 by Bookraft Solutions, Israel (Id-Extras.com)
+        // Please do not delete this copyright notice.
+
+        var myOverrideType = OverrideType.ALL;
+        // var myOverrideType = OverrideType.CHARACTER_ONLY;
+        // var myOverrideType = OverrideType.PARAGRAPH_ONLY;
+
+        var allStories = app.activeDocument.stories.everyItem();
+
+        // Remove overrides from all stories
+        try {
+            allStories.clearOverrides(myOverrideType);
+        } catch (e) {
+            alert("No stories!")
+        }
+
+        // Remove overrides from all footnotes
+        try {
+            allStories.footnotes.everyItem().texts.everyItem().clearOverrides(myOverrideType);
+        } catch (e) {
+            alert("No footnotes!")
+        }
+
+        // // Remove overrides from all table
+        // try {
+        //     allStories.tables.everyItem().cells.everyItem().paragraphs.everyItem().clearOverrides(myOverrideType);
+        // } catch (e) {
+        //     alert("No tables!")
+        // }
+
+        alert("Overrides cleared!");
+    }
+
+  function findReplaceText() {
     
-    var myOverrideType = OverrideType.ALL;
-    // var myOverrideType = OverrideType.CHARACTER_ONLY;
-    // var myOverrideType = OverrideType.PARAGRAPH_ONLY;
-
-    var allStories = app.activeDocument.stories.everyItem();
-
-    // Remove overrides from all stories
-    try{
-      allStories.clearOverrides(myOverrideType);
-    }
-    catch (e){alert ("No stories!")}
-
-    // Remove overrides from all footnotes
-    try{
-      allStories.footnotes.everyItem().texts.everyItem().clearOverrides(myOverrideType);
-    }
-    catch (e){alert ("No footnotes!")}
-
-    // Remove overrides from all table
-    try{
-      allStories.tables.everyItem().cells.everyItem().paragraphs.everyItem().clearOverrides(myOverrideType);
-    }
-    catch (e){alert ("No tables!")}
-
-    alert("Overrides cleared!");
   }
 
+    // clearOverrides();
     // Run the task functions
-    updateMetadata("FEMA", "Course Title");
-    removeEmptyFrames();
-    removeAllGraphicLines();
-    // orchestrateBook();
-    assignGraphicAsides();
+    // updateMetadata("FEMA", "Course Title");
+    // removeEmptyFrames();
+    // removeAllGraphicLines();
+    // // orchestrateBook();
+    // assignGraphicAsides();
     processParaStyles();
-    setupPDFExportPreferences();
+    // setupPDFExportPreferences();
 
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
