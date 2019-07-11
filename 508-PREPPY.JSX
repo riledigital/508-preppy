@@ -11,11 +11,6 @@ myMain();
 function myMain() {
     // Variable assignments for easy access
     myDoc = app.activeDocument; // Get the current document
-    try {
-        myBook = app.activeBook;
-    } catch (e) {
-        alert(e);
-    }
     allParaStyles = myDoc.allParagraphStyles; // Get array of all paragraph styles
     allCharStyles = myDoc.allCharacterStyles; // Get array of all character styles
 
@@ -304,6 +299,7 @@ function myMain() {
     function orchestrateBook() {
         try {
             $.writeln("Running orchestrateBook...");
+            myBook = app.activeBook;
             //changeCondition();
             makeVersion('Instructor Guide');
             makeVersion('Participant Guide');
@@ -327,30 +323,46 @@ function myMain() {
     }
 
     function setupPDFExportPreferences() {
-        // TODO: Figure out what features to enable for maximum PDF accessibility...
-        // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#PDFExportPreference.html
-        // TODO: Figure out how to define a preset
-        myDoc.pdfExportPreferences.pdfDisplayTitle = PdfDisplayTitleOptions.DISPLAY_DOCUMENT_TITLE;
-        myDoc.pdfExportPreferences.includeHyperlinks = true;
-        myDoc.pdfExportPreferences.includeStructure = true;
-        myDoc.pdfExportPreferences.cropImagesToFrames = true;
-        myDoc.pdfExportPreferences.standardsCompliance = PDFXStandards.NONE;
-        myDoc.pdfExportPreferences.pdfCompatibility = AcrobatCompatibility.ACROBAT_8;
-        myDoc.pdfExportPreferences.defaultDocumentLanguage = 'en';
-        myDoc.pdfExportPreferences.optimizePDF = true;
-        myDoc.pdfExportPreferences.generateThumbnails = true;
-        // Compression Settings
-        myDoc.pdfExportPreferences.compressTextAndLineArt = true;
-        myDoc.pdfExportPreferences.colorBitmapCompression = BitmapCompression.AUTO_COMPRESSION;
-        myDoc.pdfExportPreferences.colorBitmapQuality = CompressionQuality.HIGH;
-        myDoc.pdfExportPreferences.colorBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
-        myDoc.pdfExportPreferences.colorBitmapSampling = 144;
-      myDoc.pdfExportPreferences.thresholdToCompressColor = 144;
-        myDoc.pdfExportPreferences.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
-      myDoc.pdfExportPreferences.monochromeBitmapSamplingDPI = 144;
-      myDoc.pdfExportPreferences.thresholdToCompressMonochrome = 144;
-        myDoc.pdfExportPreferences.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
-        myDoc.pdfExportPreferences.monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+        var presetName = 'FEMA-508';
+        // TODO: Figure out what features to enable for maximum PDF accessibility... // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#PDFExportPreference.html
+        newPref = {
+            name: presetName,
+            pdfDisplayTitle: PdfDisplayTitleOptions.DISPLAY_DOCUMENT_TITLE,
+            includeHyperlinks: true,
+            includeBookmarks: true,
+            includeStructure: true,
+            cropImagesToFrames: true,
+            standardsCompliance: PDFXStandards.NONE,
+            acrobatCompatibility: AcrobatCompatibility.ACROBAT_8,
+            defaultDocumentLanguage: 'en',
+            optimizePDF: true,
+            generateThumbnails: false,
+            // Compression Settings
+            compressTextAndLineArt: true,
+            colorBitmapCompression: BitmapCompression.AUTO_COMPRESSION,
+            colorBitmapQuality: CompressionQuality.HIGH,
+            colorBitmapSampling: Sampling.BICUBIC_DOWNSAMPLE,
+            colorBitmapSamplingDPI: 96,
+            grayscaleBitmapSamplingDPI: 96,
+            grayscaleBitmapSampling: Sampling.BICUBIC_DOWNSAMPLE,
+            grayscaleBitmapQuality: CompressionQuality.MEDIUM,
+            grayscaleBitmapCompression: BitmapCompression.AUTOMATIC_JPEG_2000,
+            // thresholdToCompressColor : 1.0,
+            monochromeBitmapCompression: MonoBitmapCompression.CCIT4,
+            monochromeBitmapSamplingDPI: 96,
+            // thresholdToCompressMonochrome : 10,
+            monochromeBitmapCompression: MonoBitmapCompression.CCIT4,
+            monochromeBitmapSampling: Sampling.BICUBIC_DOWNSAMPLE
+        };
+        try {
+            selectedPreset = app.pdfExportPresets.itemByName(presetName);
+            if (app.pdfExportPresets.itemByName(presetName).isValid) {
+                app.pdfExportPresets.itemByName(presetName).remove();
+            }
+            app.pdfExportPresets.add(newPref);
+        } catch (e) {
+            alert(e);
+        }
     }
 
     function makeVersion(version) {
@@ -376,13 +388,47 @@ function myMain() {
         myCond = app.activeDocument.conditions.itemByName(conditionName.toString());
         myCond.visible = bool;
     }
+
+  function clearOverrides() {
+    // Clear All Overrides
+    // Written by TAW. (c) 2014 by Bookraft Solutions, Israel (Id-Extras.com)
+    // Please do not delete this copyright notice.
+    
+    var myOverrideType = OverrideType.ALL;
+    // var myOverrideType = OverrideType.CHARACTER_ONLY;
+    // var myOverrideType = OverrideType.PARAGRAPH_ONLY;
+
+    var allStories = app.activeDocument.stories.everyItem();
+
+    // Remove overrides from all stories
+    try{
+      allStories.clearOverrides(myOverrideType);
+    }
+    catch (e){alert ("No stories!")}
+
+    // Remove overrides from all footnotes
+    try{
+      allStories.footnotes.everyItem().texts.everyItem().clearOverrides(myOverrideType);
+    }
+    catch (e){alert ("No footnotes!")}
+
+    // Remove overrides from all table
+    try{
+      allStories.tables.everyItem().cells.everyItem().paragraphs.everyItem().clearOverrides(myOverrideType);
+    }
+    catch (e){alert ("No tables!")}
+
+    alert("Overrides cleared!");
+  }
+
     // Run the task functions
-    // updateMetadata("FEMA", "Course Title");
-    // removeEmptyFrames();
-    //removeAllGraphicLines();
+    updateMetadata("FEMA", "Course Title");
+    removeEmptyFrames();
+    removeAllGraphicLines();
     // orchestrateBook();
     assignGraphicAsides();
     processParaStyles();
+    setupPDFExportPreferences();
 
     // reset script preferences and interaction...
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
