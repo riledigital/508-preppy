@@ -5,8 +5,9 @@
 // Started June 2019
 // Helper script to speed up conversion to new layout
 /// https://forums.adobe.com/thread/885625
-
+#targetengine "session"; // not needed in Illustrator/AfterEffects
 var scriptWindow = createWindow();
+scriptWindow.show();
 
 // myMain();
 // prevent scope creep and accidentally overwritting global scope
@@ -16,9 +17,22 @@ myDoc = app.activeDocument; // Get the current document
 allParaStyles = myDoc.allParagraphStyles; // Get array of all paragraph styles
 allCharStyles = myDoc.allCharacterStyles; // Get array of all character styles
 
+// PDF Export preset
+var exportPDFPreset_508;
+
 // setting script preferences
 app.scriptPreferences.enableRedraw = 0;
 app.scriptPreferences.userInteractionLevel = UserInteractionLevels.neverInteract;
+
+function hideInteractions(bool) {
+  if (bool) {
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.neverInteract;
+  }
+  if (!bool) {    
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
+  }
+}
+
 
 $.writeln("TEST: Checking for character styles,");
 $.writeln("Count of all character Styles is " + allCharStyles.length);
@@ -303,12 +317,13 @@ function assignGraphicAsides() {
 // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Book.html#d1e59880__d1e60493
 function orchestrateBook() {
   try {
+    setupPDFExportPreferences();
     $.writeln("Running orchestrateBook...");
     myBook = app.activeBook;
-    //changeCondition();
     makeVersion('Instructor Guide');
     makeVersion('Participant Guide');
     //myBook.updateAllCrossReferences();
+
   } catch (e) {
     alert(e);
   }
@@ -318,13 +333,22 @@ function orchestrateBook() {
 function exportPDFBook(postfix) {
   $.writeln("Initializing exportPDFBook...");
   // myBook.exportFile(ExportFormat.INTERACTIVE_PDF, 'file.pdf');
-  myBook.exportFile(ExportFormat.PDF_TYPE,
-                    File(app.books[0].filePath + "/" + app.books[0].name.replace(".indb", "-" + postfix + ".pdf")), false);
+  currentPreset = app.pdfExportPresets.itemByName('FEMA-508');
+  myBook.exportFile(ExportFormat.INTERACTIVE_PDF,
+                    File(
+                      app.books[0].filePath +
+                        "/" +
+                        app.books[0].name.replace(".indb", "-" + postfix + ".pdf")),
+                    false,
+                    'FEMA-508'
+                   );
 }
 
 function syncBook() {
+  hideInteractions(true);
   $.writeln("Initializing syncBook...");
   myBook.synchronize();
+  hideInteractions(false);
 }
 
 function setupPDFExportPreferences() {
@@ -365,6 +389,7 @@ function setupPDFExportPreferences() {
       app.pdfExportPresets.itemByName(presetName).remove();
     }
     app.pdfExportPresets.add(newPref);
+    exportPDFPreset = newPref;
   } catch (e) {
     alert(e);
   }
@@ -419,7 +444,7 @@ function clearOverrides() {
       alert("No footnotes!")
     }
 
-    // // Remove overrides from all table
+    // Remove overrides from all table
     // try {
     //     allStories.tables.everyItem().cells.everyItem().paragraphs.everyItem().clearOverrides(myOverrideType);
     // } catch (e) {
@@ -446,12 +471,11 @@ function findReplaceText() {
 
 // reset script preferences and interaction...
 app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
-scriptWindow.show();
 
-alert("Finished running script.");
+// alert("Finished running script.");
 
 function createWindow() {
-  var windowOptions = new Window('dialog');
+  var windowOptions = new Window('palette');
 
   var tasksLabelText = windowOptions.add('statictext');
   tasksLabelText.text = 'Tasks to run';
@@ -483,7 +507,6 @@ function createWindow() {
     if (task_clearOverrides.value) {
       clearOverrides();
     }
-    scriptWindow.close(); // close the window after executing tasks?
   }
   // return the window at the end...
   return windowOptions;
