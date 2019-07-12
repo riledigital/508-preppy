@@ -21,7 +21,6 @@ okButton.onClick = function() {
   windowOptions.close();
 }
 
-
 processParagraphStyles.value = true;
 
 generateBookPDF.onClick = function() {

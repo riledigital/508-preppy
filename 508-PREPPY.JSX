@@ -430,37 +430,38 @@ function clearOverrides() {
   }
 }
 
-  function findReplaceText() {
+function findReplaceText() {
 
-  }
+}
 
-  // clearOverrides();
-  // // Run the task functions
-  // updateMetadata// ("FEMA", "Course Title");
-  // removeEmptyFrames();
-  // removeAllGraphicLines();
-  // // orchestrateBook();
-  // // assignGraphicAsides();
-  // processParaStyles();
-  // setupPDFExportPreferences();
+// clearOverrides();
+// Run the task functions
+// updateMetadata// ("FEMA", "Course Title");
+// removeEmptyFrames();
+// removeAllGraphicLines();
+// orchestrateBook();
+// assignGraphicAsides();
+// processParaStyles();
+// setupPDFExportPreferences();
 
-  // reset script preferences and interaction...
-  app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
-  scriptWindow.show();
-  alert("Finished script");
+// reset script preferences and interaction...
+app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
+scriptWindow.show();
 
-
-
+alert("Finished running script.");
 
 function createWindow() {
   var windowOptions = new Window('dialog');
 
+  var tasksLabelText = windowOptions.add('statictext');
+  tasksLabelText.text = 'Tasks to run';
   // Create the checklist group
   var groupTasks = windowOptions.add('panel');
   groupTasks.alignChildren = 'left';
 
   // create task checklist
-  var task_processParaStyles = groupTasks.add('checkbox', undefined, 'Replace Paragraph Styles');
+  var task_processParaStyles = groupTasks.add('checkbox', undefined, 'Replace all paragraph styles');
+  var task_clearOverrides = groupTasks.add('checkbox', undefined, 'Clear all overrides');
   task_processParaStyles.value = true;
   // create task buttons
   var okButton = windowOptions.add('button', undefined, 'Execute tasks');
@@ -479,7 +480,10 @@ function createWindow() {
       processParaStyles();
       alert('enabled ' + task_processParaStyles.value);
     }
-    windowOptions.close();
+    if (task_clearOverrides.value) {
+      clearOverrides();
+    }
+    scriptWindow.close(); // close the window after executing tasks?
   }
   // return the window at the end...
   return windowOptions;
