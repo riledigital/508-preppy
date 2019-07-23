@@ -5,6 +5,7 @@
 // Started June 2019
 // Helper script to speed up conversion to new layout
 /// https://forums.adobe.com/thread/885625
+
 #targetengine "session"; // not needed in Illustrator/AfterEffects
 var scriptWindow = createWindow();
 scriptWindow.show();
@@ -318,12 +319,11 @@ function assignGraphicAsides() {
 function orchestrateBook() {
   try {
     setupPDFExportPreferences();
-    $.writeln("Running orchestrateBook...");
+    // $.writeln("Running orchestrateBook...");
     myBook = app.activeBook;
+    myBook.updateAllCrossReferences();
     makeVersion('Instructor Guide');
     makeVersion('Participant Guide');
-    //myBook.updateAllCrossReferences();
-
   } catch (e) {
     alert(e);
   }
@@ -334,7 +334,7 @@ function exportPDFBook(postfix) {
   $.writeln("Initializing exportPDFBook...");
   // myBook.exportFile(ExportFormat.INTERACTIVE_PDF, 'file.pdf');
   currentPreset = app.pdfExportPresets.itemByName('FEMA-508');
-  myBook.exportFile(ExportFormat.INTERACTIVE_PDF,
+  myBook.exportFile(ExportFormat.PDF_TYPE,  //TODO: Figure out if this is the correct format for PDF output
                     File(
                       app.books[0].filePath +
                         "/" +
@@ -345,7 +345,7 @@ function exportPDFBook(postfix) {
 }
 
 function syncBook() {
-  hideInteractions(true);
+  hideInteractions(false);
   $.writeln("Initializing syncBook...");
   myBook.synchronize();
   hideInteractions(false);
@@ -398,19 +398,19 @@ function setupPDFExportPreferences() {
 function makeVersion(version) {
   $.writeln('Making ' + version + '...')
   if (version == 'Instructor Guide') {
-    changeCondition(version, true);
     changeCondition('Participant Guide', false);
-
+    changeCondition(version, true);
+    syncBook();
+    exportPDFBook(version);
+    return true;
   } else if (version == 'Participant Guide') {
     changeCondition(version, true);
     changeCondition('Instructor Guide', false);
-
-  } else {
-    return false;
+    syncBook();
+    exportPDFBook(version);
+    return true;
   }
-  syncBook();
-  exportPDFBook(version);
-  return true;
+  
 }
 
 // Change condition for the desired output...
@@ -477,26 +477,43 @@ app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithA
 function createWindow() {
   var windowOptions = new Window('palette');
 
+  var tasksLabelTextVer = windowOptions.add('statictext');
+  tasksLabelTextVer.text = '508-PREPPY July 23 02:19PM Build';
+
   var tasksLabelText = windowOptions.add('statictext');
-  tasksLabelText.text = 'Tasks to run';
-  // Create the checklist group
+  tasksLabelText.text = 'Tasks for converting old documents to new template:';
+  
+  // Create the checklist groups
   var groupTasks = windowOptions.add('panel');
   groupTasks.alignChildren = 'left';
 
+  var tasksLabelTextPanel2 = windowOptions.add('statictext');
+  tasksLabelTextPanel2.text = 'Convenience tasks:';
+
+  var groupTasks2 = windowOptions.add('panel');
+  groupTasks2.alignChildren = 'left';
+
   // create task checklist
   var task_processParaStyles = groupTasks.add('checkbox', undefined, 'Replace all paragraph styles');
-  var task_clearOverrides = groupTasks.add('checkbox', undefined, 'Clear all overrides');
-  task_processParaStyles.value = true;
+  var task_clearOverrides = groupTasks2.add('checkbox', undefined, 'Clear all overrides');
+  var task_setAltText = groupTasks2.add('checkbox', undefined, 'Set Alt Text to XMP Description');
+  task_processParaStyles.value = false;
+
   // create task buttons
   var okButton = windowOptions.add('button', undefined, 'Execute tasks');
   var generateBookPDF = windowOptions.add('button', undefined, 'Generate book PDFs');
+  var createPDFPreset = windowOptions.add('button', undefined, 'Create 508-FEMA PDF preset');
 
   generateBookPDF.onClick = function() {
-    $.writeln('Generating PDF files from book...');
+    $.writeln('Attempting to generate PDF files from book...');
+    alert('Attempting to generate PDF from book...')
     orchestrateBook();
   }
 
-
+  createPDFPreset.onClick = function() {
+    setupPDFExportPreferences();
+    alert('Created 508-FEMA PDF export preset in File>Adobe PDF Presets');
+  }
   // Event handlers
   okButton.onClick = function() {
     // When clicked, check each box and run the functions corresponding
@@ -506,10 +523,13 @@ function createWindow() {
     }
     if (task_clearOverrides.value) {
       clearOverrides();
+      alert('Cleared all text overrides');
+    } 
+    if (task_setAltText.value) {
+      setAltText();
+      alert('Set alt text to XMP descriptions for all graphics');
     }
   }
   // return the window at the end...
   return windowOptions;
 }
-
-
